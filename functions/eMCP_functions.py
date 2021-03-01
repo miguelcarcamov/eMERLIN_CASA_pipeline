@@ -357,7 +357,7 @@ def user_sources(inputs):
     return sources
 
 def get_antennas(msfile):
-    # Antenna list 
+    # Antenna list
     msmd.open(msfile)
     antennas = msmd.antennanames()
     msmd.close()
@@ -729,9 +729,11 @@ def import_eMERLIN_fitsIDI(eMCP):
     t0 = datetime.datetime.utcnow()
     msfile0 = msfile_name+'_imported.ms'
     rmdir(msfile0)
-    importfitsidi(fitsidifile=fitsfiles, vis=msfile0,
+    importfitsidi(fitsidifile=fitsfiles, vis=msfile0+"_temp",
                   constobsid=constobsid, scanreindexgap_s=scanreindexgap_s)
     find_casa_problems()
+    os.system("pwd")
+    os.system("casa --nogui --log2term correct_crosshand_taql.py "+msfile0+"_temp "+msfile0)
     logger.info('Created file: {}'.format(msfile0))
     logger.info('Removing initial correlator flags')
     flagdata(vis=msfile0, mode='unflag', flagbackup=False)
@@ -827,12 +829,12 @@ def import_eMERLIN_fitsIDI(eMCP):
                     )
             find_casa_problems()
         logger.info('Transformed: {0} into {1}'.format(msfile0, msfile1_sp))
-    if os.path.isdir(msfile1) == True:
-        rmdir(msfile0)
-    else:
-        logger.critical('Problem generating {}. Stopping ' \
-                        'pipeline'.format(msfile1))
-        exit_pipeline(eMCP)
+    #if os.path.isdir(msfile1) == True:
+    #    rmdir(msfile0)
+    #else:
+    #    logger.critical('Problem generating {}. Stopping ' \
+    #                    'pipeline'.format(msfile1))
+    #    exit_pipeline(eMCP)
     logger.info('Finished mstransform')
     msg += '. Hanning={0}, createmms={1}'.format(do_hanning,
                                               do_ms2mms)
@@ -1096,7 +1098,7 @@ def quack_estimating(eMCP):
 
 
 def read_flag_database(logfile, t0, t1):
-    """ Returns a numpy array with four columns and N entries going 
+    """ Returns a numpy array with four columns and N entries going
     from the starting time to the end time requested"""
     column_names = ['timestamp','antenna','status']
     data_all = np.genfromtxt(logfile, delimiter=',', dtype=None,
@@ -1759,7 +1761,7 @@ def run_initialize_models(eMCP):
     logger.info('Start init_models')
     t0 = datetime.datetime.utcnow()
     init_models = eMCP['defaults']['init_models']
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     msfile = eMCP['msinfo']['msfile']
     fluxcal = eMCP['msinfo']['sources']['fluxcal']
@@ -2327,7 +2329,7 @@ def initial_bp_cal(eMCP, caltables):
 
 
 def run_bpcal(eMCP, caltables, doplots=True):
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     bp = eMCP['defaults']['bandpass']
     msfile = eMCP['msinfo']['msfile']
@@ -2554,7 +2556,7 @@ def select_calibrator(param, eMCP, add_main=True):
 def solve_delays(eMCP, caltables, doplots=True):
     logger.info('Starting solve_delays')
     #t0 = datetime.datetime.utcnow()
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     delay = eMCP['defaults']['initial_gaincal']['delay']
     msfile = eMCP['msinfo']['msfile']
@@ -2638,7 +2640,7 @@ def delay_fringefit(eMCP, caltables):
     # Currently does not combine spws because that is not correctly implemented
     # in the pre-release version of task fringefit
     logger.info('Starting delay_fringefit')
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     delay = eMCP['defaults']['initial_gaincal']['delay']
     calsources = eMCP['msinfo']['sources']['calsources']
@@ -2714,7 +2716,7 @@ def make_spw(msinfo, spw_list):
 def gain_p_ap(eMCP, caltables, doplots=True):
     logger.info('Running gain_p_ap')
     #t0 = datetime.datetime.utcnow()
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     gain_p_ap = eMCP['defaults']['initial_gaincal']
     calsources = eMCP['msinfo']['sources']['calsources']
@@ -2855,7 +2857,7 @@ def read_source_model(model, field, msinfo, eMcalflux):
 def eM_fluxscale(eMCP, caltables):
     logger.info('Start eM_fluxscale')
     t0 = datetime.datetime.utcnow()
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     flux = eMCP['defaults']['fluxscale']
     msfile = eMCP['msinfo']['msfile']
@@ -2978,7 +2980,7 @@ def eM_fluxscale(eMCP, caltables):
 def bandpass_final(eMCP, caltables):
     logger.info('Start bandpass_final')
     t0 = datetime.datetime.utcnow()
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     bp_final = eMCP['defaults']['bandpass_final']
     msfile = eMCP['msinfo']['msfile']
@@ -3029,7 +3031,7 @@ def bandpass_final(eMCP, caltables):
 def gaincal_final(eMCP, caltables):
     logger.info('Start gaincal_final')
     t0 = datetime.datetime.utcnow()
-    # Check if all sources are in the MS: 
+    # Check if all sources are in the MS:
     check_sources_in_ms(eMCP)
     gain_final = eMCP['defaults']['gaincal_final']
 
@@ -3999,7 +4001,7 @@ def calc_Lo_drops(amp_mean, phscal_scans, threshold=0.5):
     # Sort amplitude values:
     a = np.sort(amp_mean[~np.isnan(amp_mean)])
     # Iterate to create two groups. Compute sum of std of both groups
-    # That sum will be minimum when the two groups are divided by the 
+    # That sum will be minimum when the two groups are divided by the
     # amplitude intersecting the two real distributions
     astd = np.array([0.0])
     for i in range(1,len(a)):
