@@ -732,8 +732,7 @@ def import_eMERLIN_fitsIDI(eMCP):
     importfitsidi(fitsidifile=fitsfiles, vis=msfile0+"_temp",
                   constobsid=constobsid, scanreindexgap_s=scanreindexgap_s)
     find_casa_problems()
-    os.system("pwd")
-    os.system("casa --nogui --log2term correct_crosshand_taql.py "+msfile0+"_temp "+msfile0)
+    os.system("casa --nogui --log2term -c functions/correct_crosshand_taql.py "+msfile0+"_temp "+msfile0)
     logger.info('Created file: {}'.format(msfile0))
     logger.info('Removing initial correlator flags')
     flagdata(vis=msfile0, mode='unflag', flagbackup=False)
