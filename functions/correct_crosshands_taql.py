@@ -228,10 +228,10 @@ output_ms = sys.argv[4]
 
 swap_crosshands_correlations(input_ms=input_ms, output_ms=output_ms, datacolumn="DATA")
 
-casalog.post("Doing sanity check", "INFO")
-check = sanity_check(input_ms=input_ms, output_ms=output_ms, datacolumn="DATA")
+#casalog.post("Doing sanity check", "INFO")
+#check = sanity_check(input_ms=input_ms, output_ms=output_ms, datacolumn="DATA")
 
-if check:
-	casalog.post("Swap has been done successfully", "INFO")
-else:
-	casalog.post("There has been an error when swapping columns", "SEVERE")
+#if check:
+#	casalog.post("Swap has been done successfully", "INFO")
+#else:
+#	casalog.post("There has been an error when swapping columns", "SEVERE")

@@ -990,13 +990,13 @@ def run_aoflagger_fields(eMCP):
             num_spw = len(vishead(msfile, mode = 'list', listitems = ['spw_name'])['spw_name'][0])
             for b in range(num_spw):
                 logger.info('Processing source {0}, band {1}'.format(field, b))
-                flagcommand = 'time aoflagger -fields {2} -bands {3} -strategy {0} {1}'.format(aostrategy, msfile, fields_num[field], b)
+                flagcommand = 'aoflagger -fields {2} -bands {3} -strategy {0} {1}'.format(aostrategy, msfile, fields_num[field], b)
                 #os.system(flagcommand+' | tee -a pre-cal_flag_stats.txt')
                 os.system(flagcommand)
             logger.info('Last AOFlagger command: {}'.format(flagcommand))
         else:
             logger.info('Processing source {0}, all bands'.format(field))
-            flagcommand = 'time aoflagger -fields {2} -strategy {0} {1}'.format(aostrategy, msfile, fields_num[field])
+            flagcommand = 'aoflagger -fields {2} -strategy {0} {1}'.format(aostrategy, msfile, fields_num[field])
             os.system(flagcommand+' | tee -a pre-cal_flag_stats.txt')
             logger.info('Last AOFlagger command: {}'.format(flagcommand))
         ms.writehistory(message='eMER_CASA_Pipeline: AOFlag field {0} with strategy {1}:'.format(field, aostrategy),msname=msfile)
